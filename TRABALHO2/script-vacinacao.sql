@@ -1,3 +1,111 @@
+-- SCRIPT DE CRIAÇÃO DE TABELAS
+CREATE TABLE Campanha (
+    Id_Campanha SERIAL NOT NULL,
+    Nome VARCHAR(100) NOT NULL,
+    Doenca_alvo VARCHAR(100) NOT NULL,
+    Tipo_vacina VARCHAR(30) NOT NULL,
+    Data_inicio DATE NOT NULL,
+    Data_fim DATE,
+    Publico_alvo VARCHAR(100) NOT NULL,
+    PRIMARY KEY (Id_Campanha)
+);
+
+CREATE TABLE Vacina (
+    Id_Vacina SERIAL NOT NULL,
+    Nome VARCHAR(100) NOT NULL,
+    Doenca_alvo VARCHAR(100) NOT NULL,
+    Codigo_Lote VARCHAR(100) NOT NULL,  
+    Data_Chegada DATE NOT NULL,
+    Data_Validade DATE NOT NULL,
+    Qtd_Doses INT NOT NULL,
+    PRIMARY KEY (Id_Vacina)
+);
+
+CREATE TABLE Local (
+    Id_Local SERIAL NOT NULL,
+    Nome VARCHAR(100) NOT NULL,
+    Rua VARCHAR(100) NOT NULL,
+    Bairro VARCHAR(100) NOT NULL,
+    Numero INT NOT NULL,
+    Cidade VARCHAR(100) NOT NULL,
+    Estado VARCHAR(50) NOT NULL,
+    Contato VARCHAR(100) NOT NULL,
+    Capacidade INT,
+    PRIMARY KEY (Id_Local)
+);
+
+CREATE TABLE Usuario (
+    Nome VARCHAR(100) NOT NULL,
+    CPF VARCHAR(20) NOT NULL,
+    Telefone VARCHAR(100) NOT NULL,
+    PRIMARY KEY (CPF)
+);
+
+CREATE TABLE Administrador (
+    Local_Trabalho VARCHAR(100) NOT NULL,
+    CPF VARCHAR(20) NOT NULL,
+    PRIMARY KEY (CPF),
+    FOREIGN KEY (CPF) REFERENCES Usuario(CPF) ON DELETE CASCADE
+);
+
+CREATE TABLE Cidadao (
+    Cartao_Sus VARCHAR(100),
+    Rua VARCHAR(100),
+    Bairro VARCHAR(100),
+    Numero INT,
+    Cidade VARCHAR(100),
+    Estado VARCHAR(50),
+    CPF VARCHAR(20) NOT NULL,
+    PRIMARY KEY (CPF),
+    FOREIGN KEY (CPF) REFERENCES Usuario(CPF) ON DELETE CASCADE
+);
+
+CREATE TABLE Agente_saude (
+    Email VARCHAR(100) NOT NULL,
+    Posto_Trabalho VARCHAR(100) NOT NULL,
+    CPF VARCHAR(20) NOT NULL,
+    PRIMARY KEY (CPF),
+    FOREIGN KEY (CPF) REFERENCES Usuario(CPF) ON DELETE CASCADE
+);
+
+CREATE TABLE Vacinacao (
+    Id_Vacinacao SERIAL NOT NULL,
+    Contagem INT NOT NULL,
+    Data_aplicacao DATE NOT NULL,
+    Id_Vacina INTEGER NOT NULL,
+    CPF VARCHAR(20) NOT NULL,
+    Id_Local INTEGER NOT NULL,    
+    Id_Campanha INTEGER NOT NULL, 
+    PRIMARY KEY (Id_Vacinacao),
+    FOREIGN KEY (Id_Vacina) REFERENCES Vacina(Id_Vacina),
+    FOREIGN KEY (CPF) REFERENCES Cidadao(CPF),
+    FOREIGN KEY (Id_Local) REFERENCES Local(Id_Local),
+    FOREIGN KEY (Id_Campanha) REFERENCES Campanha(Id_Campanha)
+);
+
+CREATE TABLE Parente (
+    Id_Parentesco SERIAL NOT NULL,
+    CPF_Responsavel VARCHAR(20) NOT NULL,
+    CPF_Parente VARCHAR(20) NOT NULL,
+    PRIMARY KEY (Id_Parentesco),
+    FOREIGN KEY (CPF_Responsavel) REFERENCES Cidadao(CPF),
+    FOREIGN KEY (CPF_Parente) REFERENCES Cidadao(CPF)
+);
+
+CREATE TABLE Agendamento (
+    Id_Agendamento SERIAL NOT NULL,
+    Data_Agendamento DATE NOT NULL,
+    Id_Vacina INTEGER NOT NULL,   
+    Id_Local INTEGER NOT NULL, 
+    CPF VARCHAR(20) NOT NULL,
+    PRIMARY KEY (Id_Agendamento),
+    FOREIGN KEY (Id_Vacina) REFERENCES Vacina(Id_Vacina),
+    FOREIGN KEY (Id_Local) REFERENCES Local(Id_Local),
+    FOREIGN KEY (CPF) REFERENCES Cidadao(CPF)
+);
+
+-- POVOAMENTO
+
 -- 1. CAMPANHA
 INSERT INTO Campanha (Nome, Doenca_alvo, Tipo_vacina, Data_inicio, Data_fim, Publico_alvo) VALUES
 ('Campanha Gripe 2025', 'Gripe', 'Inativada', '2025-03-01', '2025-05-30', 'Idosos'),
@@ -55,8 +163,6 @@ INSERT INTO Usuario (Nome, CPF, Telefone) VALUES
 ('Otávio Mendes', '15151515151', '(31) 90000-0014'),
 ('Patricia Silva', '16161616161', '(41) 90000-0015');
 
-
-
 -- 5. CIDADAO
 INSERT INTO Cidadao (Cartao_Sus, Rua, Bairro, Numero, Cidade, Estado, CPF) VALUES
 ('123456789012345', 'Rua A', 'Centro', 10, 'São Paulo', 'SP', '11111111111'),
@@ -83,7 +189,6 @@ INSERT INTO Administrador (Local_Trabalho, CPF) VALUES
 ('Posto Infantil', '15151515151'),
 ('UBS Jovem', '16161616161');
 
-
 -- 7. AGENTE_SAUDE
 INSERT INTO Agente_saude (Email, Posto_Trabalho, CPF) VALUES
 ('agente1@saude.gov.br', 'UBS Central', '66666666666'),
@@ -96,7 +201,6 @@ INSERT INTO Agente_saude (Email, Posto_Trabalho, CPF) VALUES
 ('agente8@saude.gov.br', 'UBS Interior', '14141414141'),
 ('agente9@saude.gov.br', 'Posto Infantil', '15151515151'),
 ('agente10@saude.gov.br', 'UBS Jovem', '16161616161');
-
 
 -- 8. PARENTE
 INSERT INTO Parente (CPF_Responsavel, CPF_Parente) VALUES
