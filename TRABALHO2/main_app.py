@@ -1,7 +1,5 @@
-# main_app.py
 import panel as pn
 
-# Importar os layouts de cada página da pasta 'pages'
 from pages.campanhas import campanhas_page_layout
 from pages.agendamentos import agendamento_page_layout
 from pages.vacinas import vacinas_page_layout
@@ -13,7 +11,7 @@ from pages.locais import locais_page_layout
 
 pn.extension('tabulator', notifications=True)
 
-# Montagem do Layout da Interface com Abas
+# --- Montagem do Layout da Interface com Abas
 app_tabs = pn.Tabs(
     ('Campanhas', campanhas_page_layout),
     ('Agendamentos', agendamento_page_layout),
@@ -22,7 +20,7 @@ app_tabs = pn.Tabs(
     ('Vacinações', vacinacoes_page_layout),
     ('Parentescos', parentescos_page_layout),
     ('Locais', locais_page_layout),
-    active=0, # Define a aba inicial (0 para Campanhas, 1 para Agendamentos, etc.)
+    active=0,
     sizing_mode='stretch_both'
 )
 
