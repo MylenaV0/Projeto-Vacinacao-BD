@@ -5,11 +5,11 @@ import sqlalchemy
 # Importar a conexão e a função de busca completa do db_config
 from db_config import engine, get_usuarios_completo
 
-# --- Widgets para FILTRAGEM ---
+# --- Widgets para Filtragem
 filtro_cpf = pn.widgets.TextInput(name="CPF do Usuário", placeholder='Filtrar por CPF...')
 filtro_nome = pn.widgets.TextInput(name="Nome do Usuário", placeholder='Filtrar por nome...')
 
-# --- Widgets do FORMULÁRIO para Inserir/Atualizar ---
+# --- Widgets do Formulário para Inserir/Atualizar 
 form_cpf = pn.widgets.TextInput(name="CPF*", placeholder="Ex: 12345678901")
 form_nome = pn.widgets.TextInput(name="Nome*", placeholder="Ex: João da Silva")
 form_telefone = pn.widgets.TextInput(name="Telefone*", placeholder="Ex: (88) 91234-5678")
@@ -36,17 +36,17 @@ def update_user_fields(tipo):
     admin_fields.visible = (tipo == 'Administrador')
     agente_fields.visible = (tipo == 'Agente de Saúde')
 
-# --- Botões de AÇÃO ---
+# --- Botões de Ação
 btn_consultar = pn.widgets.Button(name='Aplicar Filtros', button_type='primary')
 btn_limpar = pn.widgets.Button(name='Limpar Filtros', button_type='default')
 btn_inserir = pn.widgets.Button(name='Inserir Novo Usuário', button_type='success')
 btn_atualizar = pn.widgets.Button(name='Atualizar Selecionado', button_type='warning', disabled=True)
 btn_excluir = pn.widgets.Button(name='Excluir Selecionado', button_type='danger', disabled=True)
 
-# --- Tabela para exibir Usuários ---
+# --- Tabela para exibir Usuários
 tabela_usuarios = pn.widgets.Tabulator(pd.DataFrame(), layout='fit_columns', show_index=False, height=400, page_size=10)
 
-# --- FUNÇÕES ---
+# --- Funções ---
 
 def carregar_todos_usuarios():
     try:
@@ -131,13 +131,10 @@ def on_atualizar_usuario(event=None):
         with engine.connect() as connection:
             trans = connection.begin()
             try:
-                # 1. Atualiza a tabela principal
                 connection.execute(sqlalchemy.text("UPDATE Usuario SET Nome=:nome, Telefone=:tel WHERE CPF=:cpf"), 
                                    {"nome": form_nome.value, "tel": form_telefone.value, "cpf": cpf_original})
 
-                # 2. Lida com a lógica de perfis
                 if novo_tipo != tipo_original:
-                    # Se o tipo mudou, apaga o perfil antigo
                     if tipo_original == 'Cidadão':
                         connection.execute(sqlalchemy.text("DELETE FROM Cidadao WHERE CPF = :cpf"), {"cpf": cpf_original})
                     elif tipo_original == 'Administrador':
@@ -145,7 +142,6 @@ def on_atualizar_usuario(event=None):
                     elif tipo_original == 'Agente de Saúde':
                         connection.execute(sqlalchemy.text("DELETE FROM Agente_Saude WHERE CPF = :cpf"), {"cpf": cpf_original})
 
-                    # E insere o novo perfil
                     if novo_tipo == 'Cidadão':
                         connection.execute(sqlalchemy.text("INSERT INTO Cidadao (CPF, Cartao_Sus, Rua, Bairro, Numero, Cidade, Estado) VALUES (:cpf, :sus, :rua, :bairro, :num, :cid, :est)"),
                                            {"cpf": cpf_original, "sus": form_cartao_sus.value, "rua": form_rua.value, "bairro": form_bairro.value, "num": form_numero.value, "cid": form_cidade.value, "est": form_estado.value})
@@ -154,7 +150,7 @@ def on_atualizar_usuario(event=None):
                     elif novo_tipo == 'Agente de Saúde':
                         connection.execute(sqlalchemy.text("INSERT INTO Agente_Saude (CPF, Email, Posto_Trabalho) VALUES (:cpf, :email, :posto)"), {"cpf": cpf_original, "email": form_email.value, "posto": form_posto_trabalho.value})
                 else:
-                    # Se o tipo não mudou, apenas atualiza o perfil existente
+        
                     if novo_tipo == 'Cidadão':
                         connection.execute(sqlalchemy.text("UPDATE Cidadao SET Cartao_Sus=:sus, Rua=:rua, Bairro=:bairro, Numero=:num, Cidade=:cid, Estado=:est WHERE CPF=:cpf"),
                                            {"sus": form_cartao_sus.value, "rua": form_rua.value, "bairro": form_bairro.value, "num": form_numero.value, "cid": form_cidade.value, "est": form_estado.value, "cpf": cpf_original})
@@ -233,7 +229,7 @@ def preencher_formulario_selecao(selection):
     form_email.value = str(row_data.get('agente_email', ''))
     form_posto_trabalho.value = str(row_data.get('agente_posto_trabalho', ''))
 
-# --- Conexões dos Botões e Carga Inicial ---
+# --- Conexões dos Botões
 btn_consultar.on_click(on_consultar_usuario)
 btn_limpar.on_click(on_limpar_filtros)
 btn_inserir.on_click(on_inserir_usuario)
@@ -243,7 +239,7 @@ btn_excluir.on_click(on_excluir_usuario)
 carregar_todos_usuarios()
 update_user_fields(form_tipo.value)
 
-# --- Layout da Página ---
+# --- Layout da Página 
 filtros_card = pn.Card(
     pn.Column(filtro_cpf, filtro_nome),
     pn.Row(btn_consultar, btn_limpar),
