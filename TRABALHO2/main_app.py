@@ -8,7 +8,7 @@ from pages.vacinas import vacinas_page_layout
 from pages.usuarios import usuarios_page_layout
 from pages.vacinacoes import vacinacoes_page_layout
 from pages.parentescos import parentescos_page_layout
-from pages.locais import locais_page_layout # <-- Nova importação para Locais
+from pages.locais import locais_page_layout
 
 
 pn.extension('tabulator', notifications=True)
@@ -21,12 +21,12 @@ app_tabs = pn.Tabs(
     ('Usuários', usuarios_page_layout),
     ('Vacinações', vacinacoes_page_layout),
     ('Parentescos', parentescos_page_layout),
-    ('Locais', locais_page_layout), # <-- Nova aba para Locais
+    ('Locais', locais_page_layout),
     active=0, # Define a aba inicial (0 para Campanhas, 1 para Agendamentos, etc.)
     sizing_mode='stretch_both'
 )
 
-# Crie o template com tema de saúde
+
 template = pn.template.FastListTemplate(
     title="Sistema de Gerenciamento de Saúde Pública",
     sidebar=[
@@ -42,7 +42,6 @@ template = pn.template.FastListTemplate(
     accent_base_color="#4CAF50",
 )
 
-# Servir a aplicação através do template
 template.servable()
 
 # Mensagem no console para indicar que a aplicação está rodando (opcional, mas útil para debug)
