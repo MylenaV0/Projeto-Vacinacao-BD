@@ -5,26 +5,25 @@ import sqlalchemy
 # Importar a conexão e funções auxiliares do db_config
 from db_config import engine, get_cidadaos, get_parentescos
 
-# --- Widgets para FILTRAGEM ---
+# --- Widgets para Filtragem
 filtro_cpf = pn.widgets.TextInput(name="Filtrar por CPF", placeholder='Digite o CPF...')
-# ADIÇÃO: Novo widget para filtrar por nome
 filtro_nome = pn.widgets.TextInput(name="Filtrar por Nome", placeholder='Digite o nome...')
 
-# --- Widgets do FORMULÁRIO para Inserir/Atualizar ---
+# --- Widgets do Formulário para Inserir/Atualizar
 form_cpf_responsavel = pn.widgets.Select(name="CPF do Responsável*", options={})
 form_cpf_parente = pn.widgets.Select(name="CPF do Parente*", options={})
 
-# --- Botões de AÇÃO ---
+# --- Botões de Ação
 btn_consultar = pn.widgets.Button(name='Aplicar Filtros', button_type='primary')
 btn_limpar = pn.widgets.Button(name='Limpar Filtros', button_type='default')
 btn_inserir = pn.widgets.Button(name='Adicionar Parentesco', button_type='success')
 btn_atualizar = pn.widgets.Button(name='Atualizar Selecionado', button_type='warning', disabled=True)
 btn_excluir = pn.widgets.Button(name='Excluir Selecionado', button_type='danger', disabled=True)
 
-# --- Tabela ---
+# --- Tabela
 tabela_parentescos = pn.widgets.Tabulator(pd.DataFrame(), layout='fit_columns', show_index=False, height=400, page_size=10)
 
-# --- FUNÇÕES ---
+# --- Funções
 
 def update_dropdown_options():
     try:
@@ -51,7 +50,6 @@ def on_consultar_parentesco(event=None):
         df_completo = get_parentescos()
         df_filtrado = df_completo
 
-        # ATUALIZAÇÃO: Lógica de filtro combinada
         if filtro_cpf.value:
             cpf_filtrar = filtro_cpf.value.strip()
             df_filtrado = df_filtrado[
@@ -75,7 +73,6 @@ def on_consultar_parentesco(event=None):
         pn.state.notifications.error(f"Erro ao consultar parentescos: {e}")
 
 def on_limpar_filtros(event=None):
-    # ATUALIZAÇÃO: Limpa também o novo campo de nome
     filtro_cpf.value = ''
     filtro_nome.value = ''
     carregar_todos_parentescos()
@@ -167,7 +164,7 @@ def preencher_formulario_selecao(selection):
     form_cpf_responsavel.value = row_data.get('cpf_responsavel')
     form_cpf_parente.value = row_data.get('cpf_parente')
 
-# --- Conexões dos Botões e Carga Inicial ---
+# --- Conexões dos Botões
 btn_consultar.on_click(on_consultar_parentesco)
 btn_limpar.on_click(on_limpar_filtros)
 btn_inserir.on_click(on_inserir_parentesco)
@@ -178,7 +175,6 @@ carregar_todos_parentescos()
 
 # --- Layout da Página ---
 filtros_card = pn.Card(
-    # ATUALIZAÇÃO: Adicionado o filtro de nome ao layout
     filtro_cpf,
     filtro_nome,
     pn.Row(btn_consultar, btn_limpar),
