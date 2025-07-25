@@ -1,23 +1,22 @@
-# db_config.py
 import os
 import panel as pn
 import pandas as pd
 import sqlalchemy
-import psycopg2 # Adicionado: Importar psycopg2 para a conexão
+import psycopg2 # Importar psycopg2 para a conexão
 from datetime import datetime, date
 from dotenv import load_dotenv
 
 pn.extension('tabulator', notifications=True)
 
-load_dotenv() # Esta linha deve ser a primeira a carregar as VAs
+load_dotenv() 
 DB_HOST = os.getenv('DB_HOST')
 DB_PORT = os.getenv('DB_PORT')
 DB_NAME = os.getenv('DB_NAME')
 DB_USER = os.getenv('DB_USER')
-DB_PASS = os.getenv('DB_PASS') # Renomeado para DB_PASS, era DB_PASSWORD em exemplos anteriores
+DB_PASS = os.getenv('DB_PASS')
 
-# --- CONEXÃO BANCO ---
-con = None  # Inicializa con e engine fora do try/except
+# --- Conexão Banco
+con = None  
 engine = None
 
 try:
@@ -26,7 +25,7 @@ try:
         port=DB_PORT,
         database=DB_NAME,
         user=DB_USER,
-        password=DB_PASS # Corrigido: Usando DB_PASS
+        password=DB_PASS 
     )
     engine = sqlalchemy.create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
     print("Conexão com o banco de dados estabelecida com sucesso!")
@@ -40,7 +39,7 @@ except Exception as e:
         pn.state.notifications.error(f"Erro: Conexão com o banco de dados não estabelecida. Detalhes: {e}")
 
 
-# --- FUNÇÕES AUXILIARES PARA INTERAÇÃO COM O BANCO DE DADOS (CRUD Genérico) ---
+# --- Funções auxiliares para interação com o BD
 def fetch_data(query, params=None):
     """
     Busca dados do banco de dados e retorna um DataFrame do Pandas.
@@ -123,8 +122,7 @@ def table_exists(table_name):
         print(f"DEBUG: Erro ao verificar existência da tabela '{table_name}': {e}")
         return False
 
-# --- FUNÇÕES PARA PEGAR DADOS (GETTERS) ---
-# Mantenha as funções get_* que você já tem. Elas podem usar fetch_data agora.
+# --- Funções para pegar dados
 
 def get_campanhas_ativas():
     query = """
@@ -144,7 +142,7 @@ def get_vacinas():
     """
     return fetch_data(query)
 
-def get_locais(): # Esta função é importante para o seu novo módulo de Locais
+def get_locais(): 
     query = """
     SELECT Id_Local, Nome, Rua, Bairro, Numero, Cidade, Estado, Contato, Capacidade
     FROM Local
@@ -152,14 +150,7 @@ def get_locais(): # Esta função é importante para o seu novo módulo de Locai
     """
     return fetch_data(query)
 
-# Em db_config.py
-
-# Em db_config.py
-
-# Em db_config.py
-
 def get_agendamentos():
-    # A query foi corrigida para usar LEFT JOIN na tabela Campanha
     query = """
         SELECT 
             a.id_agendamento, a.cpf, u.nome AS nome_cidadao,
@@ -175,9 +166,7 @@ def get_agendamentos():
         ORDER BY a.data_agendamento DESC, u.nome ASC;
     """
     try:
-        # Usamos engine para consistência
         df = pd.read_sql(query, engine)
-        # Convertendo nomes de colunas para minúsculas por padrão para evitar erros
         df.columns = [x.lower() for x in df.columns]
         return df
     except Exception as e:
@@ -256,8 +245,7 @@ def get_parentescos():
     """
     return fetch_data(query)
 
-# --- FUNÇÕES DE VALIDAÇÃO ---
-# Mantenha as funções de validação. Elas podem usar fetch_data ou execute_query agora.
+# --- Funções de Validação
 
 def validar_cidadao_aptidao(cpf, campanha_id):
     if engine is None: return False, "Erro: Conexão com o banco de dados não estabelecida."
