@@ -6,30 +6,29 @@ from datetime import date, datetime
 # Importar a conexão do db_config
 from db_config import engine
 
-# --- Widgets para FILTRAGEM ---
+# --- Widgets para Filtragem
 filtro_nome_vacina = pn.widgets.TextInput(name="Nome da Vacina", placeholder='Filtrar por nome...')
 filtro_doenca_vacina = pn.widgets.TextInput(name="Doença Alvo", placeholder='Filtrar por doença...')
 
-# --- Widgets do FORMULÁRIO para Inserir/Atualizar ---
+# --- Widgets do Formulário para Inserir/Atualizar 
 form_nome_vacina = pn.widgets.TextInput(name="Nome da Vacina*", placeholder="Ex: CoronaVac")
 form_doenca_alvo = pn.widgets.TextInput(name="Doença Alvo*", placeholder="Ex: COVID-19")
-# CORREÇÃO 1: Alterado de TextInput para IntInput
 form_lote = pn.widgets.IntInput(name="Código do Lote*", start=0, value=0) 
 form_data_chegada = pn.widgets.DatePicker(name="Data de Chegada*")
 form_data_validade = pn.widgets.DatePicker(name="Data de Validade*")
 form_qtd_doses = pn.widgets.IntInput(name="Quantidade de Doses*", start=0, value=100)
 
-# --- Botões de AÇÃO ---
+# --- Botões de Ação
 btn_consultar = pn.widgets.Button(name='Aplicar Filtros', button_type='primary')
 btn_limpar = pn.widgets.Button(name='Limpar Filtros', button_type='default')
 btn_inserir = pn.widgets.Button(name='Inserir Nova Vacina', button_type='success')
 btn_atualizar = pn.widgets.Button(name='Atualizar Selecionada', button_type='warning', disabled=True)
 btn_excluir = pn.widgets.Button(name='Excluir Selecionada', button_type='danger', disabled=True)
 
-# --- Tabela para exibir Vacinas ---
+# --- Tabela para exibir Vacinas
 tabela_vacinas = pn.widgets.Tabulator(pd.DataFrame(), layout='fit_columns', show_index=False, height=400, page_size=10)
 
-# --- FUNÇÕES ---
+# --- Funções
 
 def formatar_datas_df(df):
     for col in ['data_chegada', 'data_validade']:
@@ -178,7 +177,7 @@ def preencher_formulario_selecao(selection):
         btn_atualizar.disabled = True
         btn_excluir.disabled = True
         form_nome_vacina.value, form_doenca_alvo.value = '', ''
-        form_lote.value = 0 # CORREÇÃO: Mudar para 0 para IntInput
+        form_lote.value = 0 
         form_data_chegada.value, form_data_validade.value = None, None
         form_qtd_doses.value = 0
         return
@@ -190,7 +189,7 @@ def preencher_formulario_selecao(selection):
     
     form_nome_vacina.value = row_data.get('nome', '')
     form_doenca_alvo.value = row_data.get('doenca_alvo', '')
-    form_lote.value = int(row_data.get('codigo_lote', 0)) # CORREÇÃO: Mudar para int
+    form_lote.value = int(row_data.get('codigo_lote', 0))
     form_qtd_doses.value = int(row_data.get('qtd_doses', 0))
     
     try:
@@ -199,7 +198,7 @@ def preencher_formulario_selecao(selection):
     except:
         form_data_chegada.value, form_data_validade.value = None, None
 
-# --- Conexão dos Botões e Carga Inicial ---
+# --- Conexão dos Botões
 btn_consultar.on_click(on_consultar_vacina)
 btn_limpar.on_click(on_limpar_filtros)
 btn_inserir.on_click(on_inserir_vacina)
@@ -208,7 +207,7 @@ btn_excluir.on_click(on_excluir_vacina)
 
 carregar_todas_vacinas()
 
-# --- Layout da Página ---
+# --- Layout da Página 
 filtros_card = pn.Card(
     pn.Column(filtro_nome_vacina, filtro_doenca_vacina),
     pn.Row(btn_consultar, btn_limpar),
