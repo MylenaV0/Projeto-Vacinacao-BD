@@ -6,14 +6,13 @@ from datetime import datetime, date
 # Importar a conexão e funções auxiliares do db_config
 from db_config import engine, get_cidadaos, get_vacinas, get_locais, get_campanhas_ativas, get_vacinacoes
 
-# --- Widgets para FILTRAGEM ---
+# --- Widgets para Filtragem
 filtro_nome_cidadao = pn.widgets.TextInput(name="Nome do Cidadão", placeholder='Filtrar por nome do cidadão...')
 filtro_nome_vacina = pn.widgets.TextInput(name="Nome da Vacina", placeholder='Filtrar por nome da vacina...')
 filtro_data_inicio = pn.widgets.DatePicker(name='Período - De:')
 filtro_data_fim = pn.widgets.DatePicker(name='Período - Até:')
 
-# --- Widgets do FORMULÁRIO para Inserir/Atualizar ---
-# ATUALIZAÇÃO: Mudança de Select para TextInput
+# --- Widgets do Formulário para Inserir/Atualizar 
 form_cpf = pn.widgets.TextInput(name="CPF do Cidadão*", placeholder="Digite o CPF para registrar...")
 form_id_vacina = pn.widgets.Select(name="Vacina (Lote)*", options={})
 form_id_local = pn.widgets.Select(name="Local de Aplicação*", options={})
@@ -21,21 +20,20 @@ form_id_campanha = pn.widgets.Select(name="Campanha*", options={})
 form_contagem = pn.widgets.IntInput(name="Contagem da Dose*", start=1, value=1)
 form_data_aplicacao = pn.widgets.DatePicker(name="Data de Aplicação*", value=date.today())
 
-# --- Botões de AÇÃO ---
+# --- Botões de Ação
 btn_consultar = pn.widgets.Button(name='Aplicar Filtros', button_type='primary')
 btn_limpar = pn.widgets.Button(name='Limpar Filtros', button_type='default')
 btn_inserir = pn.widgets.Button(name="Registrar Vacinação", button_type="success")
 btn_atualizar = pn.widgets.Button(name="Atualizar Selecionada", button_type="warning", disabled=True)
 btn_excluir = pn.widgets.Button(name="Excluir Selecionada", button_type="danger", disabled=True)
 
-# --- Tabela ---
+# --- Tabela 
 tabela_vacinacoes = pn.widgets.Tabulator(pd.DataFrame(), layout='fit_columns', show_index=False, height=400, page_size=10)
 
-# --- FUNÇÕES ---
+# --- Funções
 
 def update_dropdown_options():
     try:
-        # ATUALIZAÇÃO: Remoção da busca por cidadãos, pois não é mais um dropdown
         vacinas_df, locais_df, campanhas_df = get_vacinas(), get_locais(), get_campanhas_ativas()
         form_id_vacina.options = {f"{row['nome']} (Lote: {row['codigo_lote']}, Doses: {row['qtd_doses']})": row['id_vacina'] for _, row in vacinas_df.iterrows()} if not vacinas_df.empty else {}
         form_id_local.options = {f"{row['nome']} ({row['cidade']})": row['id_local'] for _, row in locais_df.iterrows()} if not locais_df.empty else {}
@@ -61,11 +59,9 @@ def format_and_display_df(df):
         tabela_vacinacoes.value = df
 
 def on_consultar_vacinacao(event=None):
-    # ... (Esta função permanece a mesma)
     pass
 
 def on_limpar_filtros(event=None):
-    # ... (Esta função permanece a mesma)
     pass
 
 def on_inserir_vacinacao(event=None):
@@ -78,7 +74,6 @@ def on_inserir_vacinacao(event=None):
         with engine.connect() as connection:
             trans = connection.begin()
             try:
-                # ATUALIZAÇÃO: Adicionada validação de existência do CPF
                 cidadao_existe = connection.execute(sqlalchemy.text("SELECT 1 FROM Cidadao WHERE CPF = :cpf"), {"cpf": cpf_digitado}).scalar()
                 if not cidadao_existe:
                     pn.state.notifications.warning(f"CPF '{cpf_digitado}' não encontrado ou não pertence a um cidadão."); trans.rollback(); return
@@ -101,7 +96,6 @@ def on_inserir_vacinacao(event=None):
     except Exception as e:
         pn.state.notifications.error(f"Erro de conexão: {e}")
 
-# ... (Mantenha as funções on_atualizar, on_excluir como estão, elas já pegam o CPF da linha selecionada) ...
 
 @pn.depends(tabela_vacinacoes.param.selection, watch=True)
 def preencher_formulario_selecao(selection):
@@ -109,7 +103,6 @@ def preencher_formulario_selecao(selection):
         btn_atualizar.disabled, btn_excluir.disabled = True, True
         form_contagem.value = 1
         form_data_aplicacao.value = date.today()
-        # ATUALIZAÇÃO: Limpa o campo de texto do CPF
         form_cpf.value = ''
         form_id_vacina.value, form_id_local.value, form_id_campanha.value = None, None, None
         return
@@ -117,7 +110,6 @@ def preencher_formulario_selecao(selection):
     btn_atualizar.disabled, btn_excluir.disabled = False, False
     row_data = tabela_vacinacoes.value.loc[selection[0]]
     
-    # ATUALIZAÇÃO: Preenche o campo de texto do CPF
     form_cpf.value = row_data.get('cpf', '')
     form_contagem.value = int(row_data.get('contagem', 1))
     try:
@@ -132,12 +124,7 @@ def preencher_formulario_selecao(selection):
     except (ValueError, TypeError) as e:
         pn.state.notifications.error(f"Não foi possível preencher os menus: {e}")
 
-# ... (Mantenha o resto do código, incluindo o layout, como está) ...
-# Omitido por brevidade, apenas as funções acima precisam ser alteradas.
-
-# Cole o código completo abaixo para garantir
-
-# --- CÓDIGO COMPLETO PARA SUBSTITUIÇÃO ---
+# --- Código para Substituição
 import panel as pn
 import pandas as pd
 import sqlalchemy
