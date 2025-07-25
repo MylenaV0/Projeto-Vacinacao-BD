@@ -6,22 +6,21 @@ from datetime import datetime, date
 # Importar a conexão e funções auxiliares do db_config
 from db_config import engine, get_campanhas_ativas, get_vacinas, get_locais, get_agendamentos
 
-# --- Widgets para FILTRAGEM ---
+# --- Widgets para FILTRAGEM
 filtro_cpf = pn.widgets.TextInput(name="CPF do Cidadão", placeholder='Filtrar por CPF...')
 filtro_nome = pn.widgets.TextInput(name="Nome do Cidadão", placeholder='Filtrar por nome...')
-# ATUALIZAÇÃO: Widgets para período de tempo
 filtro_data_inicio = pn.widgets.DatePicker(name='Período - De:')
 filtro_data_fim = pn.widgets.DatePicker(name='Período - Até:')
 
 
-# --- Widgets do FORMULÁRIO para Inserir/Atualizar ---
+# --- Widgets do Formulário para Inserir/Atualizar
 form_cpf = pn.widgets.TextInput(name="CPF do Cidadão*", placeholder="Ex: 12345678901")
 form_campanha = pn.widgets.Select(name="Campanha*", options={})
 form_vacina = pn.widgets.Select(name="Vacina*", options={})
 form_local = pn.widgets.Select(name="Local*", options={})
 form_data_agendamento = pn.widgets.DatePicker(name="Data do Agendamento*", value=date.today())
 
-# --- Botões de AÇÃO ---
+# --- Botões de Ação ---
 btn_consultar = pn.widgets.Button(name='Aplicar Filtros', button_type='primary')
 btn_limpar = pn.widgets.Button(name='Limpar Filtros', button_type='default')
 btn_inserir = pn.widgets.Button(name="Agendar", button_type="success")
@@ -31,8 +30,7 @@ btn_excluir = pn.widgets.Button(name="Cancelar Agendamento", button_type="danger
 # --- Tabela ---
 tabela_agendamentos = pn.widgets.Tabulator(pd.DataFrame(), layout='fit_columns', show_index=False, height=400, page_size=10)
 
-# --- FUNÇÕES ---
-
+# --- Funções ---
 def update_dropdown_options():
     try:
         campanhas_df, vacinas_df, locais_df = get_campanhas_ativas(), get_vacinas(), get_locais()
@@ -45,7 +43,6 @@ def update_dropdown_options():
 def carregar_todos_agendamentos():
     try:
         df = get_agendamentos()
-        # Armazena a data original para filtragem antes de formatar
         df['data_agendamento_original'] = pd.to_datetime(df['data_agendamento'])
         tabela_agendamentos.value = df
         format_and_display_df(df)
@@ -71,7 +68,6 @@ def on_consultar_agendamento(event=None):
         if filtro_nome.value:
             df_filtrado = df_filtrado[df_filtrado['nome_cidadao'].str.contains(filtro_nome.value, case=False, na=False)]
 
-        # ATUALIZAÇÃO: Lógica para filtro por período
         df_filtrado['data_agendamento'] = pd.to_datetime(df_filtrado['data_agendamento'])
         if filtro_data_inicio.value:
             data_inicio = pd.to_datetime(filtro_data_inicio.value)
@@ -86,13 +82,11 @@ def on_consultar_agendamento(event=None):
         pn.state.notifications.error(f"Erro ao consultar agendamentos: {e}")
 
 def on_limpar_filtros(event=None):
-    # ATUALIZAÇÃO: Limpa os novos campos de data
     filtro_cpf.value, filtro_nome.value = '', ''
     filtro_data_inicio.value, filtro_data_fim.value = None, None
     carregar_todos_agendamentos()
     pn.state.notifications.success("Filtros limpos.")
 
-# ... (Mantenha as funções on_inserir, on_atualizar, on_excluir e preencher_formulario_selecao como estão) ...
 def on_inserir_agendamento(event=None):
     if not all([form_cpf.value, form_campanha.value, form_vacina.value, form_local.value, form_data_agendamento.value]):
         pn.state.notifications.warning("Todos os campos do formulário são obrigatórios.")
@@ -186,7 +180,7 @@ def preencher_formulario_selecao(selection):
     form_vacina.value = int(row_data.get('id_vacina')) if pd.notna(row_data.get('id_vacina')) else None
     form_local.value = int(row_data.get('id_local')) if pd.notna(row_data.get('id_local')) else None
 
-# --- Conexões dos Botões e Carga Inicial ---
+# --- Conexões dos Botões
 btn_consultar.on_click(on_consultar_agendamento)
 btn_limpar.on_click(on_limpar_filtros)
 btn_inserir.on_click(on_inserir_agendamento)
@@ -195,9 +189,8 @@ btn_excluir.on_click(on_excluir_agendamento)
 
 carregar_todos_agendamentos()
 
-# --- Layout da Página ---
+# --- Layout da Página 
 filtros_card = pn.Card(
-    # ATUALIZAÇÃO: Adicionados os novos campos de data
     pn.Column(filtro_cpf, filtro_nome, filtro_data_inicio, filtro_data_fim),
     pn.Row(btn_consultar, btn_limpar),
     title="🔍 Filtros de Consulta"
