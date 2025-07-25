@@ -6,12 +6,12 @@ from datetime import date, datetime
 # Importar a conexão do db_config
 from db_config import engine
 
-# --- Widgets para FILTRAGEM ---
+# --- Widgets para Filtragem
 filtro_nome = pn.widgets.TextInput(name="Nome da Campanha", placeholder='Filtrar por nome...')
 filtro_doenca = pn.widgets.TextInput(name="Doença Alvo", placeholder='Filtrar por doença...')
 filtro_publico = pn.widgets.TextInput(name="Público Alvo", placeholder='Filtrar por público alvo...')
 
-# --- Widgets do FORMULÁRIO para Inserir/Atualizar ---
+# --- Widgets do Formulário para Inserir/Atualizar
 form_nome = pn.widgets.TextInput(name="Nome da Campanha*", placeholder='Ex: Campanha de Vacinação COVID-19')
 form_doenca = pn.widgets.TextInput(name="Doença Alvo*", placeholder='Ex: COVID-19')
 form_tipo_vacina = pn.widgets.RadioBoxGroup(name='Tipo da Vacina*', options=['Dose Única', 'Múltiplas Doses'], value='Dose Única')
@@ -19,17 +19,17 @@ form_data_inicio = pn.widgets.DatePicker(name='Data de Início*')
 form_data_fim = pn.widgets.DatePicker(name='Data de Fim (Opcional)')
 form_publico = pn.widgets.TextInput(name="Público Alvo*", placeholder='Ex: Crianças de 0-5 anos')
 
-# --- Botões de AÇÃO ---
+# --- Botões de Ação
 btn_consultar = pn.widgets.Button(name='Aplicar Filtros', button_type='primary')
 btn_limpar = pn.widgets.Button(name='Limpar Filtros', button_type='default')
 btn_inserir = pn.widgets.Button(name='Inserir Nova Campanha', button_type='success')
 btn_atualizar = pn.widgets.Button(name='Atualizar Selecionada', button_type='warning', disabled=True)
 btn_excluir = pn.widgets.Button(name='Excluir Selecionada', button_type='danger', disabled=True)
 
-# --- Tabela para exibir Campanhas ---
+# --- Tabela para exibir Campanhas
 tabela_campanhas = pn.widgets.Tabulator(pd.DataFrame(), layout='fit_columns', show_index=False, height=400, page_size=10)
 
-# --- FUNÇÕES ---
+# --- Funções ---
 
 def formatar_datas_df(df):
     for col in ['data_inicio', 'data_fim']:
@@ -141,7 +141,6 @@ def on_excluir_campanha(event=None):
 
     id_campanha = int(tabela_campanhas.value.loc[selecao[0], 'id_campanha'])
     
-    # Adicionando um print de depuração para ter certeza da conversão
     print(f"Tentando excluir ID: {id_campanha}, Tipo: {type(id_campanha)}")
 
     try:
@@ -187,13 +186,11 @@ def preencher_formulario_selecao(selection):
     form_doenca.value = row_data.get('doenca_alvo', '')
     form_publico.value = row_data.get('publico_alvo', '')
 
-    # --- CORREÇÃO APLICADA AQUI ---
     # Verifica se o valor do banco de dados existe nas opções do widget
     tipo_vacina_do_banco = row_data.get('tipo_vacina')
     if tipo_vacina_do_banco in form_tipo_vacina.options:
         form_tipo_vacina.value = tipo_vacina_do_banco
     else:
-        # Se não existir, define um valor padrão para evitar o 'None'
         form_tipo_vacina.value = 'Dose Única'
     
     try:
@@ -208,7 +205,7 @@ def preencher_formulario_selecao(selection):
     except (ValueError, TypeError):
         form_data_fim.value = pd.to_datetime(data_fim_raw).date() if pd.notna(data_fim_raw) else None
 
-# --- Conexões dos Botões e Carga Inicial ---
+# --- Conexões dos Botões
 btn_consultar.on_click(on_consultar_campanha)
 btn_limpar.on_click(on_limpar_filtros)
 btn_inserir.on_click(on_inserir_campanha)
@@ -217,7 +214,7 @@ btn_excluir.on_click(on_excluir_campanha)
 
 carregar_todas_campanhas()
 
-# --- Layout da Página ---
+# --- Layout da Página
 filtros_card = pn.Card(pn.Column(filtro_nome, filtro_doenca, filtro_publico), pn.Row(btn_consultar, btn_limpar), title="🔍 Filtros de Consulta")
 gerenciamento_card = pn.Card(pn.pane.Markdown("Para **Atualizar/Excluir**, selecione uma linha. Para **Inserir**, preencha os campos."), form_nome, form_doenca, form_publico, form_tipo_vacina, form_data_inicio, form_data_fim, pn.Row(btn_inserir, btn_atualizar, btn_excluir), title="📝 Gerenciar Campanhas", collapsed=True)
 
