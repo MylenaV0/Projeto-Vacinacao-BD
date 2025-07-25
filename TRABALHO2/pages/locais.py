@@ -6,12 +6,12 @@ from datetime import date
 # Importar a conexão do db_config
 from db_config import engine
 
-# --- Widgets para FILTRAGEM ---
+# --- Widgets para Filtragem
 filtro_nome = pn.widgets.TextInput(name="Nome do Local", placeholder='Filtrar por nome...')
 filtro_cidade = pn.widgets.TextInput(name="Cidade", placeholder='Filtrar por cidade...')
 filtro_bairro = pn.widgets.TextInput(name="Bairro", placeholder='Filtrar por bairro...')
 
-# --- Widgets do FORMULÁRIO para Inserir/Atualizar ---
+# --- Widgets do Formulário para Inserir/Atualizar
 form_nome = pn.widgets.TextInput(name="Nome do Local*", placeholder='Ex: UBS Central')
 form_rua = pn.widgets.TextInput(name="Rua*", placeholder='Ex: Rua da Saúde')
 form_bairro = pn.widgets.TextInput(name="Bairro*", placeholder='Ex: Centro')
@@ -21,17 +21,17 @@ form_estado = pn.widgets.TextInput(name="Estado (UF)*", placeholder='Ex: CE', ma
 form_contato = pn.widgets.TextInput(name="Contato*", placeholder='(88) 99999-9999')
 form_capacidade = pn.widgets.IntInput(name="Capacidade (Opcional)", start=0, value=0)
 
-# --- Botões de AÇÃO ---
+# --- Botões de Ação
 btn_consultar = pn.widgets.Button(name='Aplicar Filtros', button_type='primary')
 btn_limpar = pn.widgets.Button(name='Limpar Filtros', button_type='default')
 btn_inserir = pn.widgets.Button(name='Inserir Novo Local', button_type='success')
 btn_atualizar = pn.widgets.Button(name='Atualizar Selecionado', button_type='warning', disabled=True)
 btn_excluir = pn.widgets.Button(name='Excluir Selecionado', button_type='danger', disabled=True)
 
-# --- Tabela ---
+# --- Tabela
 tabela_locais = pn.widgets.Tabulator(pd.DataFrame(), layout='fit_columns', show_index=False, height=400, page_size=10)
 
-# --- FUNÇÕES ---
+# --- Funções 
 
 def carregar_todos_locais():
     try:
@@ -142,7 +142,6 @@ def on_excluir_local(event=None):
         with engine.connect() as connection:
             trans = connection.begin()
             try:
-                # Verificar se o local está em uso
                 check_vacinacao = connection.execute(sqlalchemy.text("SELECT 1 FROM Vacinacao WHERE Id_Local = :id"), {"id": id_local}).scalar()
                 check_agendamento = connection.execute(sqlalchemy.text("SELECT 1 FROM Agendamento WHERE Id_Local = :id"), {"id": id_local}).scalar()
 
@@ -182,7 +181,7 @@ def preencher_formulario_selecao(selection):
     form_contato.value = row_data.get('contato', '')
     form_capacidade.value = int(row_data.get('capacidade', 0)) if pd.notna(row_data.get('capacidade')) else 0
 
-# --- Conexões dos Botões e Carga Inicial ---
+# --- Conexões dos Botões
 btn_consultar.on_click(on_consultar_local)
 btn_limpar.on_click(on_limpar_filtros)
 btn_inserir.on_click(on_inserir_local)
@@ -191,7 +190,7 @@ btn_excluir.on_click(on_excluir_local)
 
 carregar_todos_locais()
 
-# --- Layout da Página ---
+# --- Layout da Página 
 filtros_card = pn.Card(
     filtro_nome, filtro_cidade, filtro_bairro,
     pn.Row(btn_consultar, btn_limpar),
